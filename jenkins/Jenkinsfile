@@ -8,7 +8,7 @@ pipeline {
         skipStagesAfterUnstable()
     }
     environment {
-        DOCKERHUB_NAMESPACE = 'your-dockerhub-username'
+        DOCKERHUB_NAMESPACE = 'anurup373'
         DOCKERHUB_REPO = 'sample-java-maven-app'
         DOCKER_TAG = "${env.BUILD_NUMBER ?: 'latest'}"
         DOCKER_IMAGE = "${DOCKERHUB_NAMESPACE}/${DOCKERHUB_REPO}:${DOCKER_TAG}"
