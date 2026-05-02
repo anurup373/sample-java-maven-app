@@ -1,8 +1,7 @@
 pipeline {
-    agent {
-        docker {
-            image 'maven:3.9-eclipse-temurin-21'  // Includes Maven and JDK
-        }
+    agent any
+    tools {
+        maven 'Maven 3.9'  // Matches the name in Global Tool Config
     }
     options {
         skipStagesAfterUnstable()
