@@ -3,6 +3,12 @@ pipeline {
     options {
         skipStagesAfterUnstable()
     }
+    environment {
+        DOCKERHUB_NAMESPACE = 'your-dockerhub-username'
+        DOCKERHUB_REPO = 'sample-java-maven-app'
+        DOCKER_TAG = "${env.BUILD_NUMBER ?: 'latest'}"
+        DOCKER_IMAGE = "${DOCKERHUB_NAMESPACE}/${DOCKERHUB_REPO}:${DOCKER_TAG}"
+    }
     stages {
         stage('Build') {
             steps {
@@ -19,9 +25,22 @@ pipeline {
                 }
             }
         }
-        stage('Deliver') { 
+        stage('Build Docker Image') {
             steps {
-                sh './jenkins/scripts/deliver.sh' 
+                sh 'docker build -t "${DOCKER_IMAGE}" .'
+            }
+        }
+        stage('Push Docker Image') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKERHUB_USERNAME', passwordVariable: 'DOCKERHUB_PASSWORD')]) {
+                    sh 'echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin'
+                    sh 'docker push "${DOCKER_IMAGE}"'
+                }
+            }
+        }
+        stage('Deliver') {
+            steps {
+                sh './jenkins/scripts/deliver.sh'
             }
         }
     }
